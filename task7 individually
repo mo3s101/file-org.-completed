@@ -1,0 +1,49 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+// Helper function to clear input buffer before getline
+void clearBuffer()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+// ==========================================
+// Task 7: Sort names in name.txt
+// ==========================================
+void task7()
+{
+    vector<string> names;
+    fstream file;
+
+    file.open("name.txt", ios::in);
+    if (!file.is_open())
+    {
+        cout << "Error opening name.txt!" << endl;
+        return;
+    }
+
+    string name;
+    while (getline(file, name))
+    {
+        names.push_back(name);
+    }
+    file.close();
+
+    file.open("name.txt", ios::trunc | ios::out);
+    sort(names.begin(), names.end());
+
+    while (!names.empty())
+    {
+        file << names.front() << endl;
+        names.erase(names.begin());
+    }
+    file.close();
+
+    cout << "the task compleet succesfully" << endl;
+}
