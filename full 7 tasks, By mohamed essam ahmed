@@ -1,0 +1,452 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+// Helper function to clear input buffer before getline
+void clearBuffer()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+// ==========================================
+// Task 1: Student data -> Student.txt
+// ==========================================
+void task1()
+{
+    string fullName;
+    int id;
+    float grade;
+
+    clearBuffer();
+    cout << "Enter Full Name: ";
+    getline(cin, fullName);
+
+    cout << "Enter ID: ";
+    cin >> id;
+
+    cout << "Enter Grade: ";
+    cin >> grade;
+
+    ofstream outFile("Student.txt");
+    if (!outFile)
+    {
+        cout << "Error creating Student.txt!\n";
+        return;
+    }
+
+    outFile << "Full Name: " << fullName << "\n";
+    outFile << "ID: " << id << "\n";
+    outFile << "Grade: " << grade << "\n";
+    outFile.close();
+
+    cout << "Student data saved to Student.txt successfully.\n";
+}
+
+// ==========================================
+// Task 2: Read fruit.txt & append "Fresh Fruits"
+// ==========================================
+void task2()
+{
+    ifstream checkFile("fruit.txt");
+    if (!checkFile.good())
+    {
+        ofstream createFruit("fruit.txt");
+        createFruit << "Apple\nOrange\nBanana\n";
+        createFruit.close();
+    }
+    checkFile.close();
+
+    ifstream inFile("fruit.txt");
+    if (!inFile)
+    {
+        cout << "Error opening fruit.txt for reading!\n";
+        return;
+    }
+
+    cout << "--- Contents of fruit.txt ---\n";
+    string line;
+    while (getline(inFile, line))
+    {
+        cout << line << "\n";
+    }
+    inFile.close();
+
+    ofstream appendFile("fruit.txt", ios::app);
+    if (!appendFile)
+    {
+        cout << "Error opening fruit.txt for appending!\n";
+        return;
+    }
+
+    appendFile << "Fresh Fruits\n";
+    appendFile.close();
+
+    cout << "\"Fresh Fruits\" appended to fruit.txt successfully.\n";
+}
+
+// ==========================================
+// Task 3: welcome.txt -> replace "body" with "one"
+// ==========================================
+void task3()
+{
+    ofstream outFile("welcome.txt");
+    if (!outFile)
+    {
+        cout << "Error creating welcome.txt!\n";
+        return;
+    }
+    outFile << "Hello Everybody";
+    outFile.close();
+
+    ifstream inFile("welcome.txt");
+    string content;
+    getline(inFile, content);
+    inFile.close();
+
+    string target = "body";
+    string replacement = "one";
+    size_t pos = content.find(target);
+
+    if (pos != string::npos)
+    {
+        content.replace(pos, target.length(), replacement);
+    }
+
+    ofstream updateFile("welcome.txt");
+    updateFile << content << "\n";
+    updateFile.close();
+
+    cout << "Updated sentence written to welcome.txt: " << content << "\n";
+}
+
+// ==========================================
+// Task 4 (Lab 1): Persons, vector, younger & older
+// ==========================================
+struct Person
+{
+    string name;
+    int age;
+};
+
+void task4()
+{
+    int n;
+    cout << "How many persons do you want to add? ";
+    cin >> n;
+
+    if (n <= 0)
+    {
+        cout << "Invalid number of persons.\n";
+        return;
+    }
+
+    ofstream outFile("persons.txt");
+    if (!outFile)
+    {
+        cout << "Error creating persons.txt!\n";
+        return;
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        string name;
+        int age;
+
+        clearBuffer();
+        cout << "Person " << (i + 1) << " Name: ";
+        getline(cin, name);
+
+        cout << "Person " << (i + 1) << " Age: ";
+        cin >> age;
+
+        outFile << name << " " << age << "\n";
+    }
+    outFile.close();
+
+    vector<Person> persons;
+    ifstream inFile("persons.txt");
+    if (!inFile)
+    {
+        cout << "Error opening persons.txt!\n";
+        return;
+    }
+
+    Person temp;
+    while (inFile >> temp.name >> temp.age)
+    {
+        persons.push_back(temp);
+    }
+    inFile.close();
+
+    if (persons.empty())
+    {
+        cout << "No person records found in file.\n";
+        return;
+    }
+
+    int minAge = persons[0].age;
+    int maxAge = persons[0].age;
+
+    for (size_t i = 1; i < persons.size(); i++)
+    {
+        if (persons[i].age < minAge)
+            minAge = persons[i].age;
+        if (persons[i].age > maxAge)
+            maxAge = persons[i].age;
+    }
+
+    ofstream resFile("results.txt");
+    if (!resFile)
+    {
+        cout << "Error creating results.txt!\n";
+        return;
+    }
+
+    resFile << "Younger Person(s) (Age: " << minAge << "):\n";
+    for (const auto &p : persons)
+    {
+        if (p.age == minAge)
+        {
+            resFile << "- " << p.name << " (" << p.age << ")\n";
+        }
+    }
+
+    resFile << "\nOlder Person(s) (Age: " << maxAge << "):\n";
+    for (const auto &p : persons)
+    {
+        if (p.age == maxAge)
+        {
+            resFile << "- " << p.name << " (" << p.age << ")\n";
+        }
+    }
+    resFile.close();
+
+    cout << "Results saved to results.txt successfully.\n";
+}
+
+// ==========================================
+// Task 5 (Lab 2): Student records delimited by '$'
+// ==========================================
+struct StudentRecord
+{
+    char name[20];
+    int id;
+    float grade;
+    char delim;
+};
+
+void task5()
+{
+    ofstream outFile("students.txt", ios::app);
+    if (!outFile)
+    {
+        cout << "Error opening students.txt!\n";
+        return;
+    }
+
+    char choice = 'y';
+    while (choice == 'y' || choice == 'Y')
+    {
+        StudentRecord rec;
+        rec.delim = '$';
+
+        clearBuffer();
+        cout << "Enter Student Name (max 19 chars): ";
+        cin.getline(rec.name, 20);
+
+        cout << "Enter ID: ";
+        cin >> rec.id;
+
+        cout << "Enter Grade: ";
+        cin >> rec.grade;
+
+        outFile << rec.name << ", " << rec.id << ", " << rec.grade << " " << rec.delim << "\n";
+
+        cout << "Add another student? (y/n): ";
+        cin >> choice;
+    }
+
+    outFile.close();
+    cout << "Student records saved to students.txt.\n";
+}
+
+// ==========================================
+// Task 6: Remove a grade from grades.txt
+// ==========================================
+void task6()
+{
+    fstream file, temp;
+
+    file.open("grades.txt", ios::in);
+    temp.open("temp_grades.txt", ios::out);
+
+    if (!file.good() || !temp.good())
+    {
+        cout << "Error opening files!" << endl;
+        if (file.is_open())
+            file.close();
+        if (temp.is_open())
+            temp.close();
+        return;
+    }
+
+    int grade;
+    while (file >> grade)
+    {
+        cout << grade << endl;
+    }
+
+    if (file.bad())
+    {
+        cout << "Serious reading error!" << endl;
+        file.close();
+        temp.close();
+        remove("temp_grades.txt");
+        return;
+    }
+
+    if (!file.eof())
+    {
+        cout << "Reading failed!" << endl;
+        file.close();
+        temp.close();
+        remove("temp_grades.txt");
+        return;
+    }
+
+    file.clear();
+    file.seekg(0, ios::beg);
+
+    bool found = false;
+    int temp_grade;
+
+    cout << "Enter the grade you want to remove: ";
+    cin >> temp_grade;
+
+    while (file >> grade)
+    {
+        if (temp_grade != grade || found)
+        {
+            temp << grade << endl;
+        }
+        else
+        {
+            found = true;
+        }
+    }
+
+    if (!temp.good())
+    {
+        cout << "Writing failed!" << endl;
+        file.close();
+        temp.close();
+        remove("temp_grades.txt");
+        return;
+    }
+
+    temp.close();
+    file.close();
+
+    if (found)
+    {
+        if (remove("grades.txt") == 0 &&
+            rename("temp_grades.txt", "grades.txt") == 0)
+        {
+            cout << "Grade deleted successfully!" << endl;
+        }
+        else
+        {
+            cout << "Error replacing file!" << endl;
+        }
+    }
+    else
+    {
+        remove("temp_grades.txt");
+        cout << "Grade not found!" << endl;
+    }
+}
+
+// ==========================================
+// Task 7: Sort names in name.txt
+// ==========================================
+void task7()
+{
+    vector<string> names;
+    fstream file;
+
+    file.open("name.txt", ios::in);
+    if (!file.is_open())
+    {
+        cout << "Error opening name.txt!" << endl;
+        return;
+    }
+
+    string name;
+    while (getline(file, name))
+    {
+        names.push_back(name);
+    }
+    file.close();
+
+    file.open("name.txt", ios::trunc | ios::out);
+    sort(names.begin(), names.end());
+
+    while (!names.empty())
+    {
+        file << names.front() << endl;
+        names.erase(names.begin());
+    }
+    file.close();
+
+    cout << "the task compleet succesfully" << endl;
+}
+
+int main()
+{
+    int choice;
+    cout << "=== Lab Tasks Menu ===\n";
+    cout << "1. Task 1 (Student File)\n";
+    cout << "2. Task 2 (Fruit File)\n";
+    cout << "3. Task 3 (Replace in welcome.txt)\n";
+    cout << "4. Task 4 (Persons Vector & Min/Max Age)\n";
+    cout << "5. Task 5 (Students Delimited by '$')\n";
+    cout << "6. Task 6 (Remove Grade from grades.txt)\n";
+    cout << "7. Task 7 (Sort Names in name.txt)\n";
+    cout << "Enter task number (1-7): ";
+    cin >> choice;
+
+    switch (choice)
+    {
+    case 1:
+        task1();
+        break;
+    case 2:
+        task2();
+        break;
+    case 3:
+        task3();
+        break;
+    case 4:
+        task4();
+        break;
+    case 5:
+        task5();
+        break;
+    case 6:
+        task6();
+        break;
+    case 7:
+        task7();
+        break;
+    default:
+        cout << "Invalid choice!\n";
+    }
+
+    return 0;
+}
