@@ -1,0 +1,49 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+// Helper function to clear input buffer before getline
+void clearBuffer()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+// ==========================================
+// Task 3: welcome.txt -> replace "body" with "one"
+// ==========================================
+void task3()
+{
+    ofstream outFile("welcome.txt");
+    if (!outFile)
+    {
+        cout << "Error creating welcome.txt!\n";
+        return;
+    }
+    outFile << "Hello Everybody";
+    outFile.close();
+
+    ifstream inFile("welcome.txt");
+    string content;
+    getline(inFile, content);
+    inFile.close();
+
+    string target = "body";
+    string replacement = "one";
+    size_t pos = content.find(target);
+
+    if (pos != string::npos)
+    {
+        content.replace(pos, target.length(), replacement);
+    }
+
+    ofstream updateFile("welcome.txt");
+    updateFile << content << "\n";
+    updateFile.close();
+
+    cout << "Updated sentence written to welcome.txt: " << content << "\n";
+}
