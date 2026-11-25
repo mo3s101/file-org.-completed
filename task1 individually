@@ -1,0 +1,49 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+// Helper function to clear input buffer before getline
+void clearBuffer()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+// ==========================================
+// Task 1: Student data -> Student.txt
+// ==========================================
+void task1()
+{
+    string fullName;
+    int id;
+    float grade;
+
+    clearBuffer();
+    cout << "Enter Full Name: ";
+    getline(cin, fullName);
+
+    cout << "Enter ID: ";
+    cin >> id;
+
+    cout << "Enter Grade: ";
+    cin >> grade;
+
+    ofstream outFile("Student.txt");
+    if (!outFile)
+    {
+        cout << "Error creating Student.txt!\n";
+        return;
+    }
+
+    outFile << "Full Name: " << fullName << "\n";
+    outFile << "ID: " << id << "\n";
+    outFile << "Grade: " << grade << "\n";
+    outFile.close();
+
+    cout << "Student data saved to Student.txt successfully.\n";
+}
