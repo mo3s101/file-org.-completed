@@ -1,0 +1,56 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+// Helper function to clear input buffer before getline
+void clearBuffer()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+// ==========================================
+// Task 2: Read fruit.txt & append "Fresh Fruits"
+// ==========================================
+void task2()
+{
+    ifstream checkFile("fruit.txt");
+    if (!checkFile.good())
+    {
+        ofstream createFruit("fruit.txt");
+        createFruit << "Apple\nOrange\nBanana\n";
+        createFruit.close();
+    }
+    checkFile.close();
+
+    ifstream inFile("fruit.txt");
+    if (!inFile)
+    {
+        cout << "Error opening fruit.txt for reading!\n";
+        return;
+    }
+
+    cout << "--- Contents of fruit.txt ---\n";
+    string line;
+    while (getline(inFile, line))
+    {
+        cout << line << "\n";
+    }
+    inFile.close();
+
+    ofstream appendFile("fruit.txt", ios::app);
+    if (!appendFile)
+    {
+        cout << "Error opening fruit.txt for appending!\n";
+        return;
+    }
+
+    appendFile << "Fresh Fruits\n";
+    appendFile.close();
+
+    cout << "\"Fresh Fruits\" appended to fruit.txt successfully.\n";
+}
