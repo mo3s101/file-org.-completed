@@ -1,0 +1,119 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+// Helper function to clear input buffer before getline
+void clearBuffer()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+// ==========================================
+// Task 4 (Lab 1): Persons, vector, younger & older
+// ==========================================
+struct Person
+{
+    string name;
+    int age;
+};
+
+void task4()
+{
+    int n;
+    cout << "How many persons do you want to add? ";
+    cin >> n;
+
+    if (n <= 0)
+    {
+        cout << "Invalid number of persons.\n";
+        return;
+    }
+
+    ofstream outFile("persons.txt");
+    if (!outFile)
+    {
+        cout << "Error creating persons.txt!\n";
+        return;
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        string name;
+        int age;
+
+        clearBuffer();
+        cout << "Person " << (i + 1) << " Name: ";
+        getline(cin, name);
+
+        cout << "Person " << (i + 1) << " Age: ";
+        cin >> age;
+
+        outFile << name << " " << age << "\n";
+    }
+    outFile.close();
+
+    vector<Person> persons;
+    ifstream inFile("persons.txt");
+    if (!inFile)
+    {
+        cout << "Error opening persons.txt!\n";
+        return;
+    }
+
+    Person temp;
+    while (inFile >> temp.name >> temp.age)
+    {
+        persons.push_back(temp);
+    }
+    inFile.close();
+
+    if (persons.empty())
+    {
+        cout << "No person records found in file.\n";
+        return;
+    }
+
+    int minAge = persons[0].age;
+    int maxAge = persons[0].age;
+
+    for (size_t i = 1; i < persons.size(); i++)
+    {
+        if (persons[i].age < minAge)
+            minAge = persons[i].age;
+        if (persons[i].age > maxAge)
+            maxAge = persons[i].age;
+    }
+
+    ofstream resFile("results.txt");
+    if (!resFile)
+    {
+        cout << "Error creating results.txt!\n";
+        return;
+    }
+
+    resFile << "Younger Person(s) (Age: " << minAge << "):\n";
+    for (const auto &p : persons)
+    {
+        if (p.age == minAge)
+        {
+            resFile << "- " << p.name << " (" << p.age << ")\n";
+        }
+    }
+
+    resFile << "\nOlder Person(s) (Age: " << maxAge << "):\n";
+    for (const auto &p : persons)
+    {
+        if (p.age == maxAge)
+        {
+            resFile << "- " << p.name << " (" << p.age << ")\n";
+        }
+    }
+    resFile.close();
+
+    cout << "Results saved to results.txt successfully.\n";
+}
