@@ -1,0 +1,60 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+// Helper function to clear input buffer before getline
+void clearBuffer()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+// ==========================================
+// Task 5 (Lab 2): Student records delimited by '$'
+// ==========================================
+struct StudentRecord
+{
+    char name[20];
+    int id;
+    float grade;
+    char delim;
+};
+
+void task5()
+{
+    ofstream outFile("students.txt", ios::app);
+    if (!outFile)
+    {
+        cout << "Error opening students.txt!\n";
+        return;
+    }
+
+    char choice = 'y';
+    while (choice == 'y' || choice == 'Y')
+    {
+        StudentRecord rec;
+        rec.delim = '$';
+
+        clearBuffer();
+        cout << "Enter Student Name (max 19 chars): ";
+        cin.getline(rec.name, 20);
+
+        cout << "Enter ID: ";
+        cin >> rec.id;
+
+        cout << "Enter Grade: ";
+        cin >> rec.grade;
+
+        outFile << rec.name << ", " << rec.id << ", " << rec.grade << " " << rec.delim << "\n";
+
+        cout << "Add another student? (y/n): ";
+        cin >> choice;
+    }
+
+    outFile.close();
+    cout << "Student records saved to students.txt.\n";
+}
