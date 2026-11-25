@@ -1,0 +1,110 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+// Helper function to clear input buffer before getline
+void clearBuffer()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+// ==========================================
+// Task 6: Remove a grade from grades.txt
+// ==========================================
+void task6()
+{
+    fstream file, temp;
+
+    file.open("grades.txt", ios::in);
+    temp.open("temp_grades.txt", ios::out);
+
+    if (!file.good() || !temp.good())
+    {
+        cout << "Error opening files!" << endl;
+        if (file.is_open())
+            file.close();
+        if (temp.is_open())
+            temp.close();
+        return;
+    }
+
+    int grade;
+    while (file >> grade)
+    {
+        cout << grade << endl;
+    }
+
+    if (file.bad())
+    {
+        cout << "Serious reading error!" << endl;
+        file.close();
+        temp.close();
+        remove("temp_grades.txt");
+        return;
+    }
+
+    if (!file.eof())
+    {
+        cout << "Reading failed!" << endl;
+        file.close();
+        temp.close();
+        remove("temp_grades.txt");
+        return;
+    }
+
+    file.clear();
+    file.seekg(0, ios::beg);
+
+    bool found = false;
+    int temp_grade;
+
+    cout << "Enter the grade you want to remove: ";
+    cin >> temp_grade;
+
+    while (file >> grade)
+    {
+        if (temp_grade != grade || found)
+        {
+            temp << grade << endl;
+        }
+        else
+        {
+            found = true;
+        }
+    }
+
+    if (!temp.good())
+    {
+        cout << "Writing failed!" << endl;
+        file.close();
+        temp.close();
+        remove("temp_grades.txt");
+        return;
+    }
+
+    temp.close();
+    file.close();
+
+    if (found)
+    {
+        if (remove("grades.txt") == 0 &&
+            rename("temp_grades.txt", "grades.txt") == 0)
+        {
+            cout << "Grade deleted successfully!" << endl;
+        }
+        else
+        {
+            cout << "Error replacing file!" << endl;
+        }
+    }
+    else
+    {
+        remove("temp_grades.txt");
+        cout << "Grade not found!" << endl;
+    }
+}
